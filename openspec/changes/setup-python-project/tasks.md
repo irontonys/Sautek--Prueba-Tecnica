@@ -14,7 +14,7 @@
 
 ## 3. Pruebas
 
-- [ ] 3.1 Escribir pruebas pytest para cada escenario de `ejecucion-cli` (sin argumentos, rutas personalizadas, archivo inexistente, archivo no Excel, hoja faltante) y verificar que `pytest` pasa
+- [x] 3.1 Escribir pruebas pytest para cada escenario de `ejecucion-cli` (sin argumentos, rutas personalizadas, archivo inexistente, archivo no Excel, hoja faltante) y verificar que `pytest` pasa
 
 ## 4. Documentación
 

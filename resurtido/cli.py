@@ -28,13 +28,13 @@ def parse_args(argv):
         "--input",
         type=Path,
         default=DEFAULT_INPUT,
-        help=f"Excel de entrada (por omisión: {DEFAULT_INPUT.relative_to(REPO_ROOT)})",
+        help="Excel de entrada (por omisión: data/inventario_ferreteria_garza.xlsx)",
     )
     parser.add_argument(
         "--output",
         type=Path,
         default=DEFAULT_OUTPUT,
-        help=f"Carpeta de salida (por omisión: {DEFAULT_OUTPUT.relative_to(REPO_ROOT)}/)",
+        help="Carpeta de salida (por omisión: output/)",
     )
     return parser.parse_args(argv)
 
