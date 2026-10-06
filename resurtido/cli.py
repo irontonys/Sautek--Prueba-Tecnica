@@ -1,0 +1,75 @@
+"""Punto de entrada por línea de comandos: `python -m resurtido`."""
+
+import argparse
+import sys
+import zipfile
+from pathlib import Path
+
+from openpyxl import load_workbook
+from openpyxl.utils.exceptions import InvalidFileException
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+DEFAULT_INPUT = REPO_ROOT / "data" / "inventario_ferreteria_garza.xlsx"
+DEFAULT_OUTPUT = REPO_ROOT / "output"
+
+EXPECTED_SHEETS = ["Existencias", "Minimos", "Producto_Proveedor", "Proveedores"]
+
+
+class InputError(Exception):
+    """Problema con el archivo de entrada que se reporta sin traceback."""
+
+
+def parse_args(argv):
+    parser = argparse.ArgumentParser(
+        prog="python -m resurtido",
+        description="Arma los pedidos de resurtido de la semana a partir del Excel de inventario.",
+    )
+    parser.add_argument(
+        "--input",
+        type=Path,
+        default=DEFAULT_INPUT,
+        help=f"Excel de entrada (por omisión: {DEFAULT_INPUT.relative_to(REPO_ROOT)})",
+    )
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=DEFAULT_OUTPUT,
+        help=f"Carpeta de salida (por omisión: {DEFAULT_OUTPUT.relative_to(REPO_ROOT)}/)",
+    )
+    return parser.parse_args(argv)
+
+
+def read_sheet_names(path):
+    if not path.exists():
+        raise InputError(f"No existe el archivo de entrada: {path}")
+    if not path.is_file():
+        raise InputError(f"La ruta de entrada no es un archivo: {path}")
+    try:
+        workbook = load_workbook(path, read_only=True)
+    except (InvalidFileException, zipfile.BadZipFile, KeyError, OSError) as exc:
+        raise InputError(f"No se pudo leer como Excel (.xlsx): {path} ({exc})") from exc
+    try:
+        return workbook.sheetnames
+    finally:
+        workbook.close()
+
+
+def check_sheets(sheet_names):
+    missing = [name for name in EXPECTED_SHEETS if name not in sheet_names]
+    if missing:
+        raise InputError("Faltan hojas en el Excel: " + ", ".join(missing))
+
+
+def main(argv=None):
+    args = parse_args(argv)
+    try:
+        check_sheets(read_sheet_names(args.input))
+    except InputError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
+    args.output.mkdir(parents=True, exist_ok=True)
+    print(f"Excel leído: {args.input}")
+    print("Hojas encontradas: " + ", ".join(EXPECTED_SHEETS))
+    print(f"Carpeta de salida: {args.output}")
+    return 0

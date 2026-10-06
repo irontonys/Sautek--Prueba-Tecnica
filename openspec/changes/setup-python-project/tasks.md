@@ -7,10 +7,10 @@
 
 ## 2. Punto de entrada
 
-- [ ] 2.1 Crear el paquete `resurtido/` con `__main__.py` y argumentos `--input`/`--output` con sus valores por omisión, y verificar que `python -m resurtido --help` muestra ambos
-- [ ] 2.2 Manejar archivo inexistente o no legible como Excel con un mensaje en español y código de salida distinto de cero, y verificar ambos casos sin que aparezca traceback
-- [ ] 2.3 Verificar la presencia de las cuatro hojas esperadas, reportando por nombre las faltantes, y verificar que `python -m resurtido` sobre el Excel real termina con código 0 e informa las cuatro hojas
-- [ ] 2.4 Crear la carpeta de salida si no existe y verificar que tras la ejecución existe `output/`
+- [x] 2.1 Crear el paquete `resurtido/` con `__main__.py` y argumentos `--input`/`--output` con sus valores por omisión, y verificar que `python -m resurtido --help` muestra ambos
+- [x] 2.2 Manejar archivo inexistente o no legible como Excel con un mensaje en español y código de salida distinto de cero, y verificar ambos casos sin que aparezca traceback
+- [x] 2.3 Verificar la presencia de las cuatro hojas esperadas, reportando por nombre las faltantes, y verificar que `python -m resurtido` sobre el Excel real termina con código 0 e informa las cuatro hojas
+- [x] 2.4 Crear la carpeta de salida si no existe y verificar que tras la ejecución existe `output/`
 
 ## 3. Pruebas
 
