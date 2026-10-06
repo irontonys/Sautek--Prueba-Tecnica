@@ -2,8 +2,8 @@
 
 ## 1. Proyecto y dependencias
 
-- [ ] 1.1 Crear `.gitignore` de Python (venv, `__pycache__`, `.pytest_cache`, `.DS_Store`) y verificar con `git status` que un venv local no aparece como archivo sin seguimiento
-- [ ] 1.2 Crear `requirements.txt` (pandas, openpyxl fijados) y `requirements-dev.txt` (pytest) y verificar que `pip install -r requirements-dev.txt` termina sin errores en un venv limpio
+- [x] 1.1 Crear `.gitignore` de Python (venv, `__pycache__`, `.pytest_cache`, `.DS_Store`) y verificar con `git status` que un venv local no aparece como archivo sin seguimiento
+- [x] 1.2 Crear `requirements.txt` (pandas, openpyxl fijados) y `requirements-dev.txt` (pytest) y verificar que `pip install -r requirements-dev.txt` termina sin errores en un venv limpio
 
 ## 2. Punto de entrada
 
