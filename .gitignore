@@ -1,0 +1,14 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Entornos virtuales
+.venv/
+venv/
+
+# Sistema
+.DS_Store
+
+# Archivos temporales de Excel abiertos
+~$*.xlsx
