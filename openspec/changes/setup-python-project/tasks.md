@@ -18,5 +18,5 @@
 
 ## 4. Documentación
 
-- [ ] 4.1 Reescribir `README.md` con requisitos (Python 3.10 o superior), instalación en venv y comando de ejecución, y verificar siguiendo sus pasos al pie de la letra en un clon limpio
-- [ ] 4.2 Crear `SUPUESTOS.md` con los supuestos iniciales (muestra de 52 productos y 8 proveedores, encabezado en la fila 2, los correos no se envían) y verificar que el README lo enlaza
+- [x] 4.1 Reescribir `README.md` con requisitos (Python 3.10 o superior), instalación en venv y comando de ejecución, y verificar siguiendo sus pasos al pie de la letra en un clon limpio
+- [x] 4.2 Crear `SUPUESTOS.md` con los supuestos iniciales (muestra de 52 productos y 8 proveedores, encabezado en la fila 2, los correos no se envían) y verificar que el README lo enlaza
