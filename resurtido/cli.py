@@ -8,6 +8,7 @@ from pathlib import Path
 from openpyxl import load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
 
+from resurtido.emails import write_drafts
 from resurtido.loader import ColumnError, load_sheets
 from resurtido.orders import build_orders, order_summary_lines
 from resurtido.report import summary_lines, write_exceptions, write_orders
@@ -80,11 +81,13 @@ def main(argv=None):
     args.output.mkdir(parents=True, exist_ok=True)
     report = write_exceptions(result.exceptions, args.output)
     orders_file = write_orders(orders, args.output)
+    drafts = write_drafts(orders, args.output)
 
     print(f"Excel leído: {args.input}")
     print("Hojas encontradas: " + ", ".join(EXPECTED_SHEETS))
     for line in summary_lines(result) + order_summary_lines(orders):
         print(line)
     print(f"Pedidos: {orders_file}")
+    print(f"Borradores de correo ({len(list(drafts.glob('*.eml')))}, sin enviar): {drafts}")
     print(f"Reporte de excepciones: {report}")
     return 0
