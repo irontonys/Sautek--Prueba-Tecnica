@@ -59,6 +59,46 @@ Si el archivo no existe, no es un Excel o le falta alguna de las hojas `Existenc
 
 Al terminar, el programa imprime un resumen que concilia los renglones leídos (repetidos + procesables + no procesables), así ningún producto se pierde sin aviso. También muestra cuántos pedidos se envían, cuáles no llegan al pedido mínimo y el total a comprar.
 
+## Odoo (opcional)
+
+El mismo Excel se puede llevar a un Odoo 17 local. Ahí las compras ya no las calcula el programa: las calcula el reabastecimiento nativo de Odoo. Esta parte es opcional y necesita [Docker](https://www.docker.com/products/docker-desktop/); el programa principal y las pruebas no dependen de ella.
+
+Levanta Odoo desde la raíz del repositorio:
+
+```bash
+docker compose -f odoo/docker-compose.yml up -d
+```
+
+El primer arranque crea la base `sautek` e instala Compras e Inventario, y tarda unos minutos. Está lista cuando `http://localhost:8070` muestra el inicio de sesión (usuario `admin`, contraseña `admin`; es una base local de prueba).
+
+Corre la carga con la contraseña en una variable de entorno:
+
+```bash
+# macOS / Linux
+ODOO_PASSWORD=admin python -m resurtido.odoo
+
+# Windows (PowerShell)
+$env:ODOO_PASSWORD = "admin"; python -m resurtido.odoo
+```
+
+`ODOO_URL` (`http://localhost:8070`), `ODOO_DB` (`sautek`) y `ODOO_USER` (`admin`) se pueden cambiar con variables del mismo nombre; acepta `--input` y `--output` igual que el programa principal.
+
+Qué hace:
+
+1. Valida el Excel con las mismas reglas y decisiones que el programa principal y carga solo lo procesable: proveedores, productos (con su costo con el proveedor), existencias y una regla de reabastecimiento por producto con su mínimo, máximo y múltiplo de empaque.
+2. Dispara el reabastecimiento de Odoo, que deja una solicitud de cotización (RFQ) en borrador por proveedor, en **Purchase → Orders → Requests for Quotation** (la base arranca en inglés). Ninguna se confirma ni se envía: el comprador la revisa y usa "Send by Email".
+3. Deja una nota interna "No enviar" en la RFQ del proveedor que no llega a su pedido mínimo, y otra con los productos a revisar (existencias negativas).
+4. Compara el total de cada RFQ contra el que calcula el programa principal.
+
+Se puede correr varias veces: actualiza en vez de duplicar y cancela solo las RFQ en borrador que dejó la corrida anterior.
+
+| Archivo | Contenido |
+|---|---|
+| `output/odoo/conciliacion.csv` | Un renglón por proveedor: RFQ en Odoo, total del programa, total de Odoo, diferencia y si cuadra. |
+| `output/odoo/excepciones.csv` | El mismo reporte de excepciones, con el pedido mínimo calculado sobre las RFQ de Odoo. |
+
+Para apagar Odoo: `docker compose -f odoo/docker-compose.yml down` (agrega `-v` para borrar también la base).
+
 ## Pruebas
 
 ```bash
@@ -71,7 +111,8 @@ python -m pytest
 | Ruta | Contenido |
 |---|---|
 | `data/` | Excel de entrada, tal como llegó |
-| `resurtido/` | Código del programa |
+| `resurtido/` | Código del programa; `resurtido/odoo/` es la carga a Odoo |
+| `odoo/` | Odoo 17 local con Docker (opcional) |
 | `tests/` | Pruebas automatizadas |
 | `output/` | Archivos generados por el programa |
 | `openspec/` | Propuestas, specs y tareas de cada fase (OpenSpec) |

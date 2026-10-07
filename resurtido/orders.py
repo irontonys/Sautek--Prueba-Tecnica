@@ -47,6 +47,18 @@ def order_quantity(existencia, maximo, multiplo):
     return -(-faltante // multiplo) * multiplo
 
 
+def minimum_shortfall_text(total, minimo):
+    return f"Total ${total:,.2f} contra mínimo ${minimo:,.2f}; faltan ${minimo - total:,.2f}"
+
+
+def minimum_not_reached(supplier, total):
+    """Excepción de pedido mínimo no alcanzado para un total ya redondeado a centavos."""
+    return DataException(
+        "Proveedores", supplier.fila_excel, supplier.proveedor_id, PEDIDO_MINIMO_NO_ALCANZADO,
+        minimum_shortfall_text(total, money(supplier.pedido_minimo)), f"{total:.2f}",
+    )
+
+
 def build_orders(products, suppliers):
     """Regresa (pedidos por proveedor, excepciones de pedido mínimo)."""
     lines_by_supplier = {supplier_id: [] for supplier_id in suppliers}
@@ -67,14 +79,7 @@ def build_orders(products, suppliers):
             order.estado = SIN_PRODUCTOS
         elif order.total < minimo:
             order.estado = NO_SE_ENVIA
-            exceptions.append(
-                DataException(
-                    "Proveedores", supplier.fila_excel, supplier_id, PEDIDO_MINIMO_NO_ALCANZADO,
-                    f"Total ${order.total:,.2f} contra mínimo ${minimo:,.2f}; "
-                    f"faltan ${minimo - order.total:,.2f}",
-                    f"{order.total:.2f}",
-                )
-            )
+            exceptions.append(minimum_not_reached(supplier, order.total))
         else:
             order.estado = SE_ENVIA
         orders.append(order)

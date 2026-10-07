@@ -29,3 +29,11 @@ Qué se hace con cada tipo de problema está en [`excepciones.csv`](output/excep
 12. **Corrida diaria.** El programa se corre al menos una vez al día, después de exportar el reporte de existencias, como propone el análisis de la Parte 1 (pregunta 3): revisar solo los lunes es una de las causas de los faltantes.
 13. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
 14. **Fecha del pedido.** El asunto y el cuerpo del correo usan la fecha del día en que se corre el programa.
+
+## Odoo (opcional)
+
+15. **Sin impuestos en Odoo.** Los productos se cargan sin impuestos de compra para que el total de cada RFQ sea comparable con el del programa, que trabaja sin IVA. La localización mexicana (IVA, CFDI) queda fuera.
+16. **Todo en Unidades.** Por el supuesto 4, existencia, mínimo, máximo y cantidades se cargan en la unidad de medida Unidades de Odoo.
+17. **Solo el comando dispara compras.** Las reglas de reabastecimiento quedan en modo manual: el scheduler nocturno de Odoo no genera compras por su cuenta. Las cantidades sí las calcula Odoo.
+18. **Moneda MXN.** La base nueva de Odoo arranca en USD; el comando pone la compañía en pesos mexicanos. Si Odoo no lo permite (por ejemplo, porque ya hay asientos contables), avisa y sigue: la moneda no cambia ningún total.
+19. **Odoo sin comprador asignado al proveedor.** Odoo junta compras nuevas en una RFQ en borrador del mismo proveedor solo si esa RFQ no tiene comprador. Las RFQ hechas a mano desde la interfaz siempre lo tienen, así que no se mezclan con las del comando.
