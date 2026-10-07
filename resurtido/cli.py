@@ -8,6 +8,10 @@ from pathlib import Path
 from openpyxl import load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
 
+from resurtido.loader import ColumnError, load_sheets
+from resurtido.report import summary_lines, write_exceptions
+from resurtido.validation import validate
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT = REPO_ROOT / "data" / "inventario_ferreteria_garza.xlsx"
 DEFAULT_OUTPUT = REPO_ROOT / "output"
@@ -64,12 +68,18 @@ def main(argv=None):
     args = parse_args(argv)
     try:
         check_sheets(read_sheet_names(args.input))
-    except InputError as exc:
+        sheets = load_sheets(args.input)
+    except (InputError, ColumnError) as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
 
+    result = validate(sheets)
     args.output.mkdir(parents=True, exist_ok=True)
+    report = write_exceptions(result.exceptions, args.output)
+
     print(f"Excel leído: {args.input}")
     print("Hojas encontradas: " + ", ".join(EXPECTED_SHEETS))
-    print(f"Carpeta de salida: {args.output}")
+    for line in summary_lines(result):
+        print(line)
+    print(f"Reporte de excepciones: {report}")
     return 0

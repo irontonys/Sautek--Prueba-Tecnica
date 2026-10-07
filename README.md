@@ -2,7 +2,7 @@
 
 Programa de resurtido semanal para el caso **Ferretera Garza**. Lee el Excel de inventario y arma los pedidos de la semana por proveedor, con un borrador de correo para cada uno y un reporte de los registros que no pudo procesar.
 
-> Estado: en construcción por fases. Por ahora el programa valida el Excel de entrada; el cálculo de pedidos llega en las siguientes fases.
+> Estado: en construcción por fases. Hoy el programa lee y valida el Excel y genera el reporte de excepciones; el cálculo de pedidos y los correos llegan en las siguientes fases.
 
 ## Requisitos
 
@@ -47,7 +47,15 @@ Por omisión lee `data/inventario_ferreteria_garza.xlsx` y escribe en `output/`.
 python -m resurtido --input otro_inventario.xlsx --output resultados/
 ```
 
-Si el archivo no existe, no es un Excel o le falta alguna de las hojas `Existencias`, `Minimos`, `Producto_Proveedor` o `Proveedores`, el programa lo dice y termina con código de salida 1.
+Si el archivo no existe, no es un Excel o le falta alguna de las hojas `Existencias`, `Minimos`, `Producto_Proveedor` o `Proveedores` (o alguna de sus columnas), el programa lo dice y termina con código de salida 1.
+
+## Salidas
+
+| Archivo | Contenido |
+|---|---|
+| `output/excepciones.csv` | Un renglón por cada problema encontrado en el Excel: hoja, fila, código, tipo, detalle, valor original y la decisión que se tomó. Abre directo en Excel. |
+
+Al terminar, el programa imprime un resumen que concilia los renglones leídos: repetidos + procesables + no procesables. Así ningún producto se pierde sin aviso.
 
 ## Pruebas
 
