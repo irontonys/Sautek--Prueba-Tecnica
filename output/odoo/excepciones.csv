@@ -1,0 +1,29 @@
+﻿hoja,fila_excel,codigo,tipo,detalle,valor_original,decision
+Existencias,5,FTR-0003,Existencia como texto,Venía como texto; se tomó como 1250,"1,250",Se convirtió a número y se procesa
+Existencias,9,FTR-0007,Existencia negativa,Existencia -4; se toma como 0 para el cálculo,-4,Se pide tomando existencia 0 y se marca para revisión del comprador
+Existencias,11,FTR-0009,Unidad distinta a la descripción,La descripción dice (caja) y la unidad es PZA,"Tornillo 1/4 x 2"" (caja)","Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,11,FTR-0009,Mismo producto con dos códigos,Misma descripción que FTR-0051,"Tornillo 1/4 x 2"" (caja)",No se procesa ningún código del grupo hasta definir cuál es el bueno
+Existencias,12,FTR-0010,Unidad distinta a la descripción,La descripción dice (bolsa) y la unidad es PZA,Taquete 1/4 (bolsa),"Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,13,FTR-0011,Producto inactivo,Estatus INACTIVO,INACTIVO,No se pide
+Existencias,13,FTR-0011,Unidad distinta a la descripción,La descripción dice (caja) y la unidad es PZA,"Pija 8 x 1"" (caja)","Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,14,FTR-0012,Unidad distinta a la descripción,La descripción dice (kg) y la unidad es PZA,"Clavo 2"" (kg)","Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,15,FTR-0013,Unidad distinta a la descripción,La descripción dice (bolsa) y la unidad es PZA,Rondana plana 3/8 (bolsa),"Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,16,FTR-0014,Unidad distinta a la descripción,La descripción dice (bolsa) y la unidad es PZA,Tuerca hexagonal 3/8 (bolsa),"Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,18,FTR-0016,Existencia vacía,La existencia está vacía,,No se procesa
+Existencias,22,FTR-0020,Unidad distinta a la descripción,La descripción dice (m) y la unidad es PZA,Cable THW 12 (m),"Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,25,FTR-0024,Producto sin mínimo,No aparece en Minimos,,No se procesa
+Existencias,33,FTR-0027,Código repetido en Existencias,El código ya aparece en la fila 28,,Se conserva la primera aparición; este renglón se ignora
+Existencias,35,FTR-0033,Producto sin proveedor,No aparece en Producto_Proveedor,,No se procesa
+Existencias,47,FTR-0045,Unidad distinta a la descripción,La descripción dice (par) y la unidad es PZA,"Bisagra 3"" (par)","Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,53,FTR-0051,Unidad distinta a la descripción,La descripción dice (caja) y la unidad es PZA,Tornillo 1/4 x 2 (caja),"Se supone la misma unidad en existencia, mínimo y máximo (ver SUPUESTOS.md)"
+Existencias,53,FTR-0051,Mismo producto con dos códigos,Misma descripción que FTR-0009,Tornillo 1/4 x 2 (caja),No se procesa ningún código del grupo hasta definir cuál es el bueno
+Existencias,53,FTR-0051,Producto sin mínimo,No aparece en Minimos,,No se procesa
+Existencias,54,FTR-0052,Producto sin mínimo,No aparece en Minimos,,No se procesa
+Existencias,54,FTR-0052,Producto sin proveedor,No aparece en Producto_Proveedor,,No se procesa
+Minimos,6,FTR-0004,Código con formato distinto,Se escribió ' ftr-0004 '; corresponde a FTR-0004, ftr-0004 ,Se normalizó el código y se procesa
+Minimos,15,FTR-0013,Código con formato distinto,Se escribió ' ftr-0013 '; corresponde a FTR-0013, ftr-0013 ,Se normalizó el código y se procesa
+Minimos,21,FTR-0019,Mínimo mayor que máximo,Mínimo 60 mayor que máximo 40,60 / 40,No se procesa
+Minimos,23,FTR-0021,Código ausente de Existencias,No aparece en Existencias,,No se procesa
+Minimos,28,FTR-0027,Código con formato distinto,Se escribió 'FTR-27'; corresponde a FTR-0027,FTR-27,Se normalizó el código y se procesa
+Producto_Proveedor,23,FTR-0021,Código ausente de Existencias,No aparece en Existencias,,No se procesa
+Proveedores,7,P05,Pedido mínimo no alcanzado,"Total $12,664.05 contra mínimo $15,000.00; faltan $2,335.95",12664.05,No se envía el pedido; el comprador decide si lo completa
