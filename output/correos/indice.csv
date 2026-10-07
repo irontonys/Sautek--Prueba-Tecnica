@@ -1,0 +1,8 @@
+﻿proveedor_id,proveedor,correo,estado,archivo,productos,total_mxn,revisar_antes_de_enviar
+P01,Distribuidora Truper Norte,ventas@truper-norte.mx,Se envía,P01_distribuidora-truper-norte.eml,11,168209.93,FTR-0007
+P02,Aceros y Tornillería del Golfo,pedidos@atgolfo.mx,Se envía,P02_aceros-y-tornilleria-del-golfo.eml,2,22912.98,
+P03,Pinturas Industriales Regias,contacto@pir.mx,Se envía,P03_pinturas-industriales-regias.eml,3,44175.54,
+P04,Eléctricos Santa Catarina,compras@esc.mx,Se envía,P04_electricos-santa-catarina.eml,1,10201.20,
+P05,Plomería Express MTY,ventas@plomex.mx,No se envía,,1,12664.05,
+P06,Herramientas Cumbres,pedidos@hcumbres.mx,Se envía,P06_herramientas-cumbres.eml,1,26098.32,
+P07,Selladores y Adhesivos SA,ventas@sya.mx,Se envía,P07_selladores-y-adhesivos-sa.eml,1,39531.63,
