@@ -9,8 +9,9 @@ from openpyxl import load_workbook
 from openpyxl.utils.exceptions import InvalidFileException
 
 from resurtido.loader import ColumnError, load_sheets
-from resurtido.report import summary_lines, write_exceptions
-from resurtido.validation import validate
+from resurtido.orders import build_orders, order_summary_lines
+from resurtido.report import summary_lines, write_exceptions, write_orders
+from resurtido.validation import sort_exceptions, validate
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT = REPO_ROOT / "data" / "inventario_ferreteria_garza.xlsx"
@@ -74,12 +75,16 @@ def main(argv=None):
         return 1
 
     result = validate(sheets)
+    orders, order_exceptions = build_orders(result.products, result.suppliers)
+    result.exceptions = sort_exceptions(result.exceptions + order_exceptions)
     args.output.mkdir(parents=True, exist_ok=True)
     report = write_exceptions(result.exceptions, args.output)
+    orders_file = write_orders(orders, args.output)
 
     print(f"Excel leído: {args.input}")
     print("Hojas encontradas: " + ", ".join(EXPECTED_SHEETS))
-    for line in summary_lines(result):
+    for line in summary_lines(result) + order_summary_lines(orders):
         print(line)
+    print(f"Pedidos: {orders_file}")
     print(f"Reporte de excepciones: {report}")
     return 0

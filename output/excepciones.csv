@@ -26,3 +26,4 @@ Minimos,21,FTR-0019,Mínimo mayor que máximo,Mínimo 60 mayor que máximo 40,60
 Minimos,23,FTR-0021,Código ausente de Existencias,No aparece en Existencias,,No se procesa
 Minimos,28,FTR-0027,Código con formato distinto,Se escribió 'FTR-27'; corresponde a FTR-0027,FTR-27,Se normalizó el código y se procesa
 Producto_Proveedor,23,FTR-0021,Código ausente de Existencias,No aparece en Existencias,,No se procesa
+Proveedores,7,P05,Pedido mínimo no alcanzado,"Total $12,664.05 contra mínimo $15,000.00; faltan $2,335.95",12664.05,No se envía el pedido; el comprador decide si lo completa

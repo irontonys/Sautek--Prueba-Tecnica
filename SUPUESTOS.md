@@ -17,8 +17,14 @@ Qué se hace con cada tipo de problema está en [`excepciones.csv`](output/excep
 6. **Códigos normalizados.** `ftr-0004`, ` FTR-27 ` y similares se llevan a `FTR-0004` / `FTR-0027` antes de cruzar las hojas. Cada caso se reporta.
 7. **Tipos sin decisión.** Costos o múltiplos inválidos, pedido mínimo inválido, correo inválido y proveedor inexistente no aparecen en este Excel. Si aparecen, el producto (o el proveedor) no se procesa y el reporte dice "Pendiente de decisión".
 
+## Cálculo de pedidos
+
+8. **"Por debajo del mínimo" es estrictamente menor.** Si la existencia es igual al mínimo, no se pide.
+9. **El redondeo puede pasar el máximo.** El enunciado pide redondear hacia arriba al múltiplo de empaque, así que el inventario resultante puede quedar arriba del máximo (por ejemplo, FTR-0001: 3 + 60 = 63 con máximo 60). Se respeta el múltiplo porque el proveedor no vende piezas sueltas.
+10. **Pedido mínimo no alcanzado: no se envía.** Si el total de un proveedor no llega a su pedido mínimo, el pedido no se manda ni se completa automáticamente; aparece como "No se envía" en `pedidos.xlsx` y en `excepciones.csv`, y el comprador decide si lo completa. Completarlo solo llevaría a subir cantidades por encima del máximo sin que nadie lo apruebe.
+
 ## Operación
 
-8. **Los correos no se envían.** El programa deja borradores; mandarlos sigue siendo decisión del comprador.
-9. **Corrida diaria.** El programa se corre al menos una vez al día, después de exportar el reporte de existencias, como propone el análisis de la Parte 1 (pregunta 3): revisar solo los lunes es una de las causas de los faltantes.
-10. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
+11. **Los correos no se envían.** El programa deja borradores; mandarlos sigue siendo decisión del comprador.
+12. **Corrida diaria.** El programa se corre al menos una vez al día, después de exportar el reporte de existencias, como propone el análisis de la Parte 1 (pregunta 3): revisar solo los lunes es una de las causas de los faltantes.
+13. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
