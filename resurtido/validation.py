@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 
 import pandas as pd
 
-from resurtido.loader import ROW_COLUMN
+from resurtido.loader import ROW_COLUMN, SHEET_COLUMNS
 
 # Tipos de excepción (se escriben tal cual en la columna `tipo` del reporte).
 EXISTENCIA_TEXTO = "Existencia como texto"
@@ -36,6 +36,7 @@ MULTIPLO_INVALIDO = "Múltiplo de empaque inválido"
 PROVEEDOR_INEXISTENTE = "Proveedor inexistente"
 PEDIDO_MINIMO_INVALIDO = "Pedido mínimo inválido"
 CORREO_INVALIDO = "Correo inválido"
+PEDIDO_MINIMO_NO_ALCANZADO = "Pedido mínimo no alcanzado"
 
 PENDING = "Pendiente de decisión"
 
@@ -70,6 +71,9 @@ DECISIONS = {
     SIN_PROVEEDOR: Decision("No se procesa", True),
     MINIMO_INVALIDO: Decision("No se procesa", True),
     MINIMO_MAYOR_MAXIMO: Decision("No se procesa", True),
+    PEDIDO_MINIMO_NO_ALCANZADO: Decision(
+        "No se envía el pedido; el comprador decide si lo completa", False
+    ),
 }
 
 
@@ -99,6 +103,7 @@ class Supplier:
     nombre: str
     correo: str
     pedido_minimo: float
+    fila_excel: int = 0
 
 
 @dataclass
@@ -250,7 +255,7 @@ def _validate_suppliers(frame, found):
             )
             pedido_minimo = 0
         suppliers[supplier_id] = Supplier(
-            supplier_id, as_text(row["Nombre"]).strip(), correo, float(pedido_minimo)
+            supplier_id, as_text(row["Nombre"]).strip(), correo, float(pedido_minimo), int(fila)
         )
     return suppliers, invalid
 
@@ -442,6 +447,11 @@ def validate(sheets):
             )
         )
 
-    sheet_order = {name: i for i, name in enumerate(sheets)}
-    result.exceptions = sorted(found.items, key=lambda e: (sheet_order[e.hoja], e.fila_excel))
+    result.exceptions = sort_exceptions(found.items)
     return result
+
+
+def sort_exceptions(items):
+    """Ordena las excepciones como aparecen en el Excel: por hoja y luego por fila."""
+    sheet_order = {name: i for i, name in enumerate(SHEET_COLUMNS)}
+    return sorted(items, key=lambda e: (sheet_order[e.hoja], e.fila_excel))
