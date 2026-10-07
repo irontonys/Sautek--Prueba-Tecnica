@@ -8,8 +8,17 @@ El PDF de la prueba pide: "Si algo del caso no queda claro, asume lo que te pare
 2. **El encabezado está en la fila 2.** Cada hoja trae en la fila 1 un título descriptivo (por ejemplo, "Reporte de existencias exportado del ERP actual"). Se asume que así sale siempre del sistema y el programa lee los encabezados de la fila 2.
 3. **El Excel no se modifica.** El archivo en `data/` se queda tal como llegó; cualquier corrección se hace dentro del programa y queda registrada en el reporte de excepciones.
 
+## Calidad de datos
+
+Qué se hace con cada tipo de problema está en [`excepciones.csv`](output/excepciones.csv) (columna `decision`) y en el diseño de la fase de validación. Supuestos detrás de esas decisiones:
+
+4. **Mismas unidades.** Varias descripciones dicen caja, bolsa, kg, m o par mientras la columna Unidad dice PZA. Se supone que existencia, mínimo y máximo están en la misma unidad, sea cual sea; esos productos se procesan y quedan marcados en el reporte.
+5. **Existencia negativa = 0.** Una existencia negativa probablemente es un error de captura (salidas sin su entrada). Se pide como si no hubiera piezas, y el producto queda marcado para que el comprador lo revise antes de mandar el pedido.
+6. **Códigos normalizados.** `ftr-0004`, ` FTR-27 ` y similares se llevan a `FTR-0004` / `FTR-0027` antes de cruzar las hojas. Cada caso se reporta.
+7. **Tipos sin decisión.** Costos o múltiplos inválidos, pedido mínimo inválido, correo inválido y proveedor inexistente no aparecen en este Excel. Si aparecen, el producto (o el proveedor) no se procesa y el reporte dice "Pendiente de decisión".
+
 ## Operación
 
-4. **Los correos no se envían.** El programa deja borradores; mandarlos sigue siendo decisión del comprador.
-5. **Corrida semanal.** El programa se corre una vez por semana, después de exportar el reporte de existencias del lunes.
-6. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
+8. **Los correos no se envían.** El programa deja borradores; mandarlos sigue siendo decisión del comprador.
+9. **Corrida diaria.** El programa se corre al menos una vez al día, después de exportar el reporte de existencias, como propone el análisis de la Parte 1 (pregunta 3): revisar solo los lunes es una de las causas de los faltantes.
+10. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
