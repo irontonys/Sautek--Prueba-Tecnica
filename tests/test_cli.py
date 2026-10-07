@@ -4,18 +4,9 @@ import subprocess
 import sys
 
 import pytest
-from openpyxl import Workbook
 
 from resurtido import cli
-
-
-def make_workbook(path, sheets):
-    workbook = Workbook()
-    workbook.remove(workbook.active)
-    for name in sheets:
-        workbook.create_sheet(name)
-    workbook.save(path)
-    return path
+from tests.conftest import write_workbook
 
 
 def test_sin_argumentos_lee_excel_por_omision_y_crea_output(tmp_path, monkeypatch, capsys):
@@ -29,7 +20,7 @@ def test_sin_argumentos_lee_excel_por_omision_y_crea_output(tmp_path, monkeypatc
 
 
 def test_rutas_personalizadas(tmp_path, capsys):
-    source = make_workbook(tmp_path / "otro.xlsx", cli.EXPECTED_SHEETS)
+    source = write_workbook(tmp_path / "otro.xlsx")
     output = tmp_path / "resultados"
 
     assert cli.main(["--input", str(source), "--output", str(output)]) == 0
@@ -57,12 +48,25 @@ def test_archivo_que_no_es_excel(tmp_path, capsys):
 
 def test_hoja_faltante(tmp_path, capsys):
     sheets = [name for name in cli.EXPECTED_SHEETS if name != "Minimos"]
-    source = make_workbook(tmp_path / "sin_minimos.xlsx", sheets)
+    source = write_workbook(tmp_path / "sin_minimos.xlsx", sheets=sheets)
     output = tmp_path / "out"
 
     assert cli.main(["--input", str(source), "--output", str(output)]) != 0
 
     assert "Minimos" in capsys.readouterr().err
+    assert not output.exists()
+
+
+def test_columna_faltante(tmp_path, capsys):
+    source = write_workbook(
+        tmp_path / "sin_maximo.xlsx", columns={"Minimos": ["Codigo", "Minimo"]}
+    )
+    output = tmp_path / "out"
+
+    assert cli.main(["--input", str(source), "--output", str(output)]) != 0
+
+    err = capsys.readouterr().err
+    assert "Minimos" in err and "Maximo" in err
     assert not output.exists()
 
 
