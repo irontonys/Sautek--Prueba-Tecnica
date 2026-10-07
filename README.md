@@ -2,7 +2,6 @@
 
 Programa de resurtido semanal para el caso **Ferretera Garza**. Lee el Excel de inventario y arma los pedidos de la semana por proveedor, con un borrador de correo para cada uno y un reporte de los registros que no pudo procesar.
 
-> Estado: en construcción por fases. Hoy el programa valida el Excel, arma los pedidos por proveedor y genera el reporte de excepciones; los borradores de correo llegan en la siguiente fase.
 
 ## Requisitos
 
@@ -54,6 +53,8 @@ Si el archivo no existe, no es un Excel o le falta alguna de las hojas `Existenc
 | Archivo | Contenido |
 |---|---|
 | `output/pedidos.xlsx` | Hoja **Resumen**: un renglón por proveedor con productos, total, pedido mínimo y estado (se envía, no se envía o sin productos por pedir). Hoja **Detalle**: un renglón por producto a pedir con cantidad, importe y la marca "Revisar". |
+| `output/correos/*.eml` | Un borrador de correo por cada pedido que se envía, con destinatario, asunto, la tabla de productos y el total. **No se envían**: se abren con doble clic en Outlook o Apple Mail, se revisan y se mandan a mano. |
+| `output/correos/indice.csv` | Índice interno de los borradores: estado de cada pedido, archivo, total y la columna "revisar_antes_de_enviar" con los productos que el comprador debe checar antes de mandar el correo. |
 | `output/excepciones.csv` | Un renglón por cada problema encontrado en el Excel: hoja, fila, código, tipo, detalle, valor original y la decisión que se tomó. Abre directo en Excel. |
 
 Al terminar, el programa imprime un resumen que concilia los renglones leídos (repetidos + procesables + no procesables), así ningún producto se pierde sin aviso. También muestra cuántos pedidos se envían, cuáles no llegan al pedido mínimo y el total a comprar.

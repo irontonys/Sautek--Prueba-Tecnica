@@ -25,6 +25,7 @@ Qué se hace con cada tipo de problema está en [`excepciones.csv`](output/excep
 
 ## Operación
 
-11. **Los correos no se envían.** El programa deja borradores; mandarlos sigue siendo decisión del comprador.
+11. **Los correos no se envían.** El programa deja borradores `.eml`; mandarlos sigue siendo decisión del comprador. No tienen remitente: el cliente de correo pone la cuenta de quien los abre. Los pedidos que no llegan al pedido mínimo no generan borrador.
 12. **Corrida diaria.** El programa se corre al menos una vez al día, después de exportar el reporte de existencias, como propone el análisis de la Parte 1 (pregunta 3): revisar solo los lunes es una de las causas de los faltantes.
 13. **Moneda.** Todos los importes están en pesos mexicanos (MXN), como lo indican los nombres de columna.
+14. **Fecha del pedido.** El asunto y el cuerpo del correo usan la fecha del día en que se corre el programa.
