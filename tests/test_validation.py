@@ -60,6 +60,18 @@ def test_columna_faltante_sin_traceback(tmp_path):
     assert "Traceback" not in result.stderr
 
 
+def test_lectura_conserva_el_tipo_de_cada_celda(tmp_path):
+    # pd.read_excel convertía el 1 en True cuando la columna también trae un booleano.
+    path = write_workbook(tmp_path / "x.xlsx", overrides={"Existencias": [
+        ["FTR-0001", "Martillo uña 16 oz", True, "PZA", "ACTIVO"],
+        ["FTR-0002", "Desarmador plano 1/4", 1, "PZA", "ACTIVO"],
+    ]})
+
+    values = list(load_sheets(path)["Existencias"]["Existencia"])
+
+    assert [(value, type(value)) for value in values] == [(True, bool), (1, int)]
+
+
 # Existencias
 
 
