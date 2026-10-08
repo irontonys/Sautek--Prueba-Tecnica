@@ -1,0 +1,2 @@
+# El editor de VBA espera CRLF al importar módulos en Windows.
+*.bas text eol=crlf
