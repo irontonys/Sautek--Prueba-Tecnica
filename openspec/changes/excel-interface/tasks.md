@@ -31,5 +31,5 @@
 
 ## 7. Documentación y entregables
 
-- [ ] 7.1 Armar y versionar `excel/Resurtido.xlsm`; README con el libro como forma principal de uso (habilitar macros, desbloquear en Windows, los cuatro pasos), la terminal como alternativa técnica y Odoo como extra; `SUPUESTOS.md` con la lógica duplicada y la regla de cambiar los dos lados; verificar siguiendo el README desde cero con el libro descargado de GitHub
+- [x] 7.1 Armar y versionar `excel/Resurtido.xlsm`; README con el libro como forma principal de uso (habilitar macros, desbloquear en Windows, los cuatro pasos), la terminal como alternativa técnica y Odoo como extra; `SUPUESTOS.md` con la lógica duplicada y la regla de cambiar los dos lados; verificar siguiendo el README desde cero con el libro descargado de GitHub
 - [ ] 7.2 Recorrido completo en Excel para Mac con capturas en `docs/img/` (cargar, revisar, corregir, preparar, completar P05 y generar correos); verificar que el resultado coincide con el spec
