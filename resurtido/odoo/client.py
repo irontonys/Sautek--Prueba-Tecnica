@@ -70,6 +70,10 @@ class OdooClient:
     def unlink(self, model, ids):
         return self._execute(model, "unlink", [ids])
 
+    def execute(self, model, method, *args, **kwargs):
+        """Llama un método de modelo que no va sobre registros (por ejemplo, `message_process`)."""
+        return self._execute(model, method, list(args), kwargs)
+
     def call(self, model, method, ids, context=None, **kwargs):
         """Llama un método público sobre registros (por ejemplo, un botón)."""
         if context:
