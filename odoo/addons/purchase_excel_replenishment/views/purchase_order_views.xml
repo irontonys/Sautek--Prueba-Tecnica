@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_demo_reply" model="ir.ui.view">
+        <field name="name">purchase.order.form.demo.reply</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_simulate_vendor_reply" type="object"
+                        string="Simular respuesta del proveedor" invisible="not show_demo_reply"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="show_demo_reply" invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Lista de RFQ: botón a la vista, junto a "New", sin seleccionar registros. -->
+    <record id="purchase_order_kpis_tree_excel_import" model="ir.ui.view">
+        <field name="name">purchase.order.kpis.tree.excel.import</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="%(purchase_excel_replenishment.action_excel_replenishment_wizard)d" type="action"
+                        string="Importar inventario (Excel)" class="btn-secondary" display="always"
+                        groups="purchase.group_purchase_manager"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

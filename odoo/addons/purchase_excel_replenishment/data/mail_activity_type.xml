@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_act_review_exceptions" model="mail.activity.type">
+        <field name="name">Revisar excepciones</field>
+        <field name="summary">Revisar excepciones de inventario</field>
+        <field name="res_model">purchase.replenishment.import</field>
+        <field name="icon">fa-exclamation-triangle</field>
+        <field name="delay_count">0</field>
+    </record>
+</odoo>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_excel_replenishment_wizard_form" model="ir.ui.view">
+        <field name="name">purchase.excel.replenishment.wizard.form</field>
+        <field name="model">purchase.excel.replenishment.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Importar inventario (Excel)">
+                <field name="state" invisible="1"/>
+                <div invisible="state != 'upload'">
+                    <p>Sube el Excel de inventario exportado del sistema, con las hojas
+                        <b>Existencias</b>, <b>Minimos</b>, <b>Producto_Proveedor</b> y <b>Proveedores</b>.</p>
+                    <p class="text-muted">Odoo lo revisa con las reglas del caso, carga lo que se puede procesar
+                        y deja las solicitudes de cotización en borrador, sin enviar. Lo que no se pudo
+                        procesar queda en el reporte de excepciones.</p>
+                </div>
+                <group invisible="state != 'upload'">
+                    <field name="file" filename="filename" required="state == 'upload'"/>
+                    <field name="filename" invisible="1"/>
+                </group>
+                <group invisible="state != 'done'">
+                    <field name="summary" nolabel="1" colspan="2" class="font-monospace"/>
+                    <field name="exceptions_file" filename="exceptions_filename"/>
+                    <field name="exceptions_filename" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_import" type="object" string="Importar" class="btn-primary"
+                            invisible="state != 'upload'"/>
+                    <button name="action_view_rfqs" type="object" string="Ver RFQ" class="btn-primary"
+                            invisible="state != 'done'"/>
+                    <button string="Cerrar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_excel_replenishment_wizard" model="ir.actions.act_window">
+        <field name="name">Importar inventario (Excel)</field>
+        <field name="res_model">purchase.excel.replenishment.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
+    <menuitem id="menu_excel_replenishment_wizard"
+              name="Importar inventario (Excel)"
+              parent="purchase.menu_procurement_management"
+              action="action_excel_replenishment_wizard"
+              groups="purchase.group_purchase_manager"
+              sequence="20"/>
+</odoo>

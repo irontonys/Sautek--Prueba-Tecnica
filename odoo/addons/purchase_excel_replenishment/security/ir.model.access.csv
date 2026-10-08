@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_excel_replenishment_wizard_manager,excel.replenishment.wizard manager,model_purchase_excel_replenishment_wizard,purchase.group_purchase_manager,1,1,1,1
+access_replenishment_exception_user,purchase.replenishment.exception user,model_purchase_replenishment_exception,purchase.group_purchase_user,1,1,0,0
+access_replenishment_exception_manager,purchase.replenishment.exception manager,model_purchase_replenishment_exception,purchase.group_purchase_manager,1,1,1,1
+access_replenishment_import_user,purchase.replenishment.import user,model_purchase_replenishment_import,purchase.group_purchase_user,1,0,0,0
+access_replenishment_import_manager,purchase.replenishment.import manager,model_purchase_replenishment_import,purchase.group_purchase_manager,1,1,1,1
