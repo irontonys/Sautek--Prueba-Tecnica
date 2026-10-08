@@ -2,13 +2,40 @@
 
 Programa de resurtido semanal para el caso **Ferretera Garza**. Lee el Excel de inventario y arma los pedidos de la semana por proveedor, con un borrador de correo para cada uno y un reporte de los registros que no pudo procesar.
 
+Se usa de tres formas:
 
-## Requisitos
+- **El libro de Excel `excel/Resurtido.xlsm`**: la forma principal, pensada para Compras. Todo se hace con cuatro botones, sin instalar nada.
+- **La terminal** (`python -m resurtido`): la misma lógica en Python, para quien la mantiene o la quiere automatizar.
+- **Odoo** (opcional): lleva el inventario a un Odoo 17 local y deja las solicitudes de cotización ahí.
+
+## Uso: el libro de Excel
+
+Solo necesitas Microsoft Excel (Windows o Mac) con macros habilitadas. No hace falta Python.
+
+1. Descarga [`excel/Resurtido.xlsm`](excel/Resurtido.xlsm) y guárdalo en una carpeta propia, por ejemplo `Documentos/Resurtido/`. Los correos se escriben junto al libro.
+2. **Solo en Windows:** clic derecho en el archivo → **Propiedades** → marca **Desbloquear** → **Aceptar**. Windows bloquea las macros de los archivos descargados de internet.
+3. Abre el libro. Si Excel lo pregunta, da **Habilitar contenido** (Windows) o **Habilitar macros** (Mac).
+4. En la hoja **Inicio**, sigue los cuatro botones en orden:
+
+| Paso | Botón | Qué hace |
+|---|---|---|
+| 1 | **Cargar inventario** | Pide el Excel que exporta el sistema y copia sus cuatro hojas al libro. El archivo original no se modifica. |
+| 2 | **Revisar datos** | Llena la hoja **Excepciones**: un renglón por problema, con color según su gravedad y un enlace **Ir a la celda**. Corrige en las hojas de datos y vuelve a dar **Revisar datos**; cada cambio a mano queda en la hoja **Correcciones**. |
+| 3 | **Preparar pedidos** | Llena **Resumen** (un renglón por proveedor) y **Detalle** (un renglón por producto). En Detalle puedes ajustar la **Cantidad** (celdas amarillas): el importe, el total y el estado se recalculan solos, y una cantidad que no es múltiplo del empaque se pinta de color. |
+| 4 | **Generar correos** | Escribe en la carpeta `correos/`, junto al libro, un borrador `.eml` por pedido que se envía y el `indice.csv`. Si cambiaste las hojas de datos después del paso 3, te pide preparar los pedidos de nuevo. **No envía nada.** |
+
+La hoja **Inicio** muestra el estado de cada paso. Los borradores se abren con doble clic. Outlook para Windows los abre como borrador listo para enviar; Apple Mail los muestra como mensaje recibido, y con **Mensaje → Volver a enviar** se abren para editar y enviar.
+
+El libro aplica las mismas reglas que el programa de Python, y una prueba automatizada compara los dos resultados (ver [Pruebas](#pruebas)). Para cambiar el código del libro: [`excel/README.md`](excel/README.md).
+
+## Alternativa técnica: la terminal
+
+### Requisitos
 
 - Python 3.10 o superior
 - Git
 
-## Instalación
+### Instalación
 
 ```bash
 git clone https://github.com/irontonys/Sautek--Prueba-Tecnica.git
@@ -32,7 +59,7 @@ Instala las dependencias:
 pip install -r requirements.txt
 ```
 
-## Uso
+### Uso
 
 Desde la raíz del repositorio:
 
@@ -48,7 +75,7 @@ python -m resurtido --input otro_inventario.xlsx --output resultados/
 
 Si el archivo no existe, no es un Excel o le falta alguna de las hojas `Existencias`, `Minimos`, `Producto_Proveedor` o `Proveedores` (o alguna de sus columnas), el programa lo dice y termina con código de salida 1.
 
-## Salidas
+### Salidas
 
 | Archivo | Contenido |
 |---|---|
@@ -167,10 +194,13 @@ pip install -r requirements-dev.txt
 python -m pytest
 ```
 
+`tests/test_excel_paridad.py` corre el mismo inventario por el libro de Excel y por Python, con la misma fecha, y compara excepciones, pedidos y borradores byte a byte: con el Excel real y con libros de prueba que cubren todos los tipos de excepción. Toma el control de Excel unos segundos, así que solo corre en una Mac con Microsoft Excel; en otra computadora se omite. Para omitirla a propósito: `RESURTIDO_SKIP_EXCEL=1 python -m pytest`.
+
 ## Estructura
 
 | Ruta | Contenido |
 |---|---|
+| `excel/` | Libro `Resurtido.xlsm` para Compras, su código VBA y cómo se arma |
 | `data/` | Excel de entrada, tal como llegó |
 | `resurtido/` | Código del programa; `resurtido/odoo/` es la carga a Odoo |
 | `odoo/` | Odoo 17 local con Docker (opcional): imagen, compose y los módulos `purchase_supply_tracking` (seguimiento), `purchase_excel_replenishment` (importar el Excel desde Compras), `purchase_quote_reader` (leer la cotización del proveedor) y `sautek_demo_mail` (correo de la demostración) |

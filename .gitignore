@@ -12,3 +12,6 @@ venv/
 
 # Archivos temporales de Excel abiertos
 ~$*.xlsx
+
+# Archivos temporales de Excel abiertos (libros con macros)
+~$*.xlsm
