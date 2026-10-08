@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formulario: la barra de seguimiento reemplaza a la barra de estado nativa. -->
+    <record id="purchase_order_form_supply_status" model="ir.ui.view">
+        <field name="name">purchase.order.form.supply.status</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header/field[@name='state']" position="attributes">
+                <attribute name="invisible">1</attribute>
+            </xpath>
+            <xpath expr="//header/field[@name='state']" position="after">
+                <field name="supply_status" widget="statusbar"
+                       statusbar_visible="prepared,waiting_quote,quote_received,approved,po_sent,partial,received"/>
+            </xpath>
+            <xpath expr="//field[@name='partner_ref']" position="after">
+                <field name="quote_received_at" invisible="not quote_received_at"/>
+                <field name="po_sent_at" invisible="not po_sent_at"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Listas de RFQ y de compras: columna con colores. -->
+    <record id="purchase_order_kpis_tree_supply_status" model="ir.ui.view">
+        <field name="name">purchase.order.kpis.tree.supply.status</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="supply_status" widget="badge" optional="show"
+                       decoration-muted="supply_status in ('prepared', 'cancelled')"
+                       decoration-info="supply_status in ('waiting_quote', 'approved', 'po_sent')"
+                       decoration-warning="supply_status in ('quote_received', 'partial')"
+                       decoration-success="supply_status == 'received'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_tree_supply_status" model="ir.ui.view">
+        <field name="name">purchase.order.view.tree.supply.status</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="supply_status" widget="badge" optional="show"
+                       decoration-muted="supply_status in ('prepared', 'cancelled')"
+                       decoration-info="supply_status in ('waiting_quote', 'approved', 'po_sent')"
+                       decoration-warning="supply_status in ('quote_received', 'partial')"
+                       decoration-success="supply_status == 'received'"/>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Búsqueda: filtros por estatus clave y agrupación por seguimiento. -->
+    <record id="view_purchase_order_filter_supply_status" model="ir.ui.view">
+        <field name="name">request.quotation.select.supply.status</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.view_purchase_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='starred']" position="after">
+                <separator/>
+                <filter name="supply_waiting_quote" string="Esperando cotización"
+                        domain="[('supply_status', '=', 'waiting_quote')]"/>
+                <filter name="supply_quote_received" string="Cotización por aprobar"
+                        domain="[('supply_status', '=', 'quote_received')]"/>
+                <filter name="supply_in_transit" string="PO enviada, sin recibir completo"
+                        domain="[('supply_status', 'in', ('po_sent', 'partial'))]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter name="group_supply_status" string="Seguimiento" context="{'group_by': 'supply_status'}"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="purchase_order_view_search_supply_status" model="ir.ui.view">
+        <field name="name">purchase.order.select.supply.status</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_search"/>
+        <field name="arch" type="xml">
+            <xpath expr="//filter[@name='starred']" position="after">
+                <separator/>
+                <filter name="supply_quote_received" string="Cotización por aprobar"
+                        domain="[('supply_status', '=', 'quote_received')]"/>
+                <filter name="supply_in_transit" string="PO enviada, sin recibir completo"
+                        domain="[('supply_status', 'in', ('po_sent', 'partial'))]"/>
+            </xpath>
+            <xpath expr="//group" position="inside">
+                <filter name="group_supply_status" string="Seguimiento" context="{'group_by': 'supply_status'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -46,6 +46,19 @@ def set_company_currency(client, company_id):
     return None
 
 
+def set_base_url(client):
+    """Los enlaces de los correos ("View Purchase Order") salen de `web.base.url`.
+
+    Una base nueva la trae en el puerto 8069 hasta que el admin entra por el navegador;
+    con el Odoo del repo en otro puerto, los avisos apuntarían a otro Odoo. Un cliente sin
+    URL (el que corre dentro de Odoo) no la toca: ahí Odoo la mantiene al día.
+    """
+    if not client.url:
+        return
+    client.execute("ir.config_parameter", "set_param", "web.base.url", client.url)
+    client.execute("ir.config_parameter", "set_param", "web.base.url.freeze", "True")
+
+
 def _upsert(client, model, existing_ids, vals_by_key):
     """Escribe los registros que ya existen y crea el resto. Regresa {llave: id}."""
     ids = {}
@@ -180,6 +193,7 @@ def load(client, result):
     used = {p.proveedor_id for p in products}
     suppliers = {sid: s for sid, s in result.suppliers.items() if sid in used}
 
+    set_base_url(client)
     warehouse_id, location_id, company_id = _main_warehouse(client)
     loaded = LoadResult(warehouse_id, location_id)
     warning = set_company_currency(client, company_id)

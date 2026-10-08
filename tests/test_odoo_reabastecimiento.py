@@ -6,13 +6,15 @@ from decimal import Decimal
 from resurtido import cli as resurtido_cli
 from resurtido.loader import load_sheets
 from resurtido.odoo import cli
-from resurtido.odoo.reconcile import CUADRA, NO_CUADRA, reconcile
-from resurtido.odoo.replenish import Rfq, cancel_previous, post_notes, read_rfqs, run_replenishment
+from resurtido.odoo.reconcile import CUADRA, EN_PROCESO, NO_CUADRA, reconcile, reconciliation_lines
+from resurtido.odoo.replenish import (
+    Rfq, cancel_previous, post_notes, read_rfqs, run_replenishment, subscribe_buyer,
+)
 from resurtido.odoo.sync import load
 from resurtido.orders import build_orders
 from resurtido.validation import PEDIDO_MINIMO_NO_ALCANZADO, validate
 from tests.conftest import write_workbook
-from tests.fake_odoo import FakeOdooClient
+from tests.fake_odoo import ADMIN_PARTNER_ID, FakeOdooClient
 
 ENV = {"ODOO_PASSWORD": "prueba"}
 FORBIDDEN = {"button_confirm", "button_approve", "action_rfq_send", "print_quotation"}
@@ -186,6 +188,28 @@ def test_las_notas_son_internas(tmp_path):
     assert {m["subtype_xmlid"] for m in odoo.by("mail.message")} == {"mail.mt_note"}
 
 
+# Comprador como seguidor
+
+def test_el_comprador_sigue_las_rfq_sin_ser_responsable(tmp_path):
+    odoo = FakeOdooClient()
+    _, rfqs = replenish(odoo, validated(tmp_path))
+
+    subscribe_buyer(odoo, rfqs)
+
+    followed = {f["res_id"] for f in odoo.by("mail.followers", partner_id=ADMIN_PARTNER_ID)}
+    assert followed == {i for rfq in rfqs.values() for i in rfq.order_ids}
+    assert not any(o.get("user_id") for o in odoo.by("purchase.order"))
+
+
+def test_el_comando_suscribe_al_comprador(tmp_path):
+    odoo = FakeOdooClient()
+
+    cli.main(["--output", str(tmp_path / "out")], environ=ENV, connect=lambda settings: odoo)
+
+    drafts = {o["id"] for o in odoo.by("purchase.order", state="draft")}
+    assert {f["res_id"] for f in odoo.by("mail.followers")} == drafts
+
+
 # Conciliación
 
 def _orders(tmp_path):
@@ -211,6 +235,35 @@ def test_conciliacion_no_cuadra(tmp_path):
 
     assert rows[0].estado == NO_CUADRA
     assert rows[0].diferencia == Decimal("0.02")
+
+
+def test_conciliacion_compra_en_proceso(tmp_path):
+    orders = _orders(tmp_path)
+
+    rows = reconcile(orders, {}, ["P01"], in_progress={"P01"})
+
+    assert rows[0].estado == EN_PROCESO
+    lines = reconciliation_lines(rows)
+    assert lines[0] == "Comprobación del cálculo: 0 de 1 proveedores cuadran"
+    assert "Con compra en proceso" in lines[1] and "P01" in lines[1]
+    assert not any("No cuadra" in line for line in lines)
+
+
+def test_reimportar_con_rfq_enviada_es_compra_en_proceso(tmp_path):
+    from resurtido.odoo.cli import run_import
+
+    odoo = FakeOdooClient()
+    first = run_import(odoo, validated(tmp_path))
+    sent = first.rfqs["P01"].order_ids[0]
+    odoo.records["purchase.order"][sent]["state"] = "sent"
+
+    again = tmp_path / "otra"
+    again.mkdir()
+    second = run_import(odoo, validated(again))
+
+    row = next(r for r in second.rows if r.proveedor_id == "P01")
+    assert row.estado == EN_PROCESO
+    assert "P01" not in second.rfqs  # Odoo no lo vuelve a pedir
 
 
 def test_conciliacion_sin_productos_en_ambos_lados(tmp_path):
@@ -257,3 +310,19 @@ def test_punta_a_punta_mismas_excepciones_que_la_cli(tmp_path):
     odoo_report = (tmp_path / "a" / "odoo" / "excepciones.csv").read_text(encoding="utf-8-sig")
     cli_report = (tmp_path / "b" / "excepciones.csv").read_text(encoding="utf-8-sig")
     assert odoo_report == cli_report
+
+
+def test_run_import_es_la_misma_secuencia_que_el_comando():
+    from resurtido.odoo.cli import import_summary_lines, run_import
+
+    result = validate(load_sheets(resurtido_cli.DEFAULT_INPUT))
+    odoo = FakeOdooClient()
+
+    imported = run_import(odoo, result)
+
+    assert len(imported.rfqs) == 7
+    assert [e.codigo for e in imported.minimum_exceptions] == ["P05"]
+    assert len(result.exceptions) == 28
+    lines = import_summary_lines(result, imported)
+    assert "RFQ en borrador generadas por Odoo (sin enviar): 7" in lines
+    assert "Comprobación del cálculo: 8 de 8 proveedores cuadran" in lines

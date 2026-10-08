@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="mail_act_review_quote" model="mail.activity.type">
+        <field name="name">Revisar cotización y aprobar</field>
+        <field name="summary">Revisar cotización y aprobar</field>
+        <field name="res_model">purchase.order</field>
+        <field name="icon">fa-check-square-o</field>
+        <field name="delay_count">0</field>
+    </record>
+</odoo>

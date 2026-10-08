@@ -13,6 +13,7 @@ from collections import defaultdict
 from resurtido.odoo.client import OdooError
 
 WAREHOUSE_ID, STOCK_LOCATION_ID, COMPANY_ID, BUY_ROUTE_ID = 1, 8, 1, 5
+ADMIN_UID, ADMIN_PARTNER_ID = 2, 3
 USD_ID, MXN_ID = 1, 33
 
 
@@ -22,6 +23,11 @@ class FakeOdooClient:
         self.calls = []
         self._ids = itertools.count(100)
         self.reject_currency = reject_currency
+        self.uid = ADMIN_UID
+        self.url = "http://localhost:8070"
+        self.params = {}
+        self.processed_emails = []
+        self.records["res.users"][ADMIN_UID] = {"partner_id": ADMIN_PARTNER_ID, "login": "admin"}
         self.records["stock.warehouse"][WAREHOUSE_ID] = {
             "lot_stock_id": STOCK_LOCATION_ID, "company_id": COMPANY_ID,
         }
@@ -80,9 +86,27 @@ class FakeOdooClient:
                 self.records[model][rec_id]["state"] = "cancel"
         elif (model, method) == ("purchase.order", "message_post"):
             self.create("mail.message", [{"model": model, "res_id": ids[0], **kwargs}])
+        elif (model, method) == ("purchase.order", "message_subscribe"):
+            self.create("mail.followers", [
+                {"res_model": model, "res_id": rec_id, "partner_id": partner_id}
+                for rec_id in ids for partner_id in kwargs["partner_ids"]
+            ])
         else:
             raise AssertionError(f"Método no simulado: {model}.{method}")
         return False
+
+    def execute(self, model, method, *args, **kwargs):
+        """Solo `ir.config_parameter.set_param` y la entrada de correo (`mail.thread.message_process`)."""
+        self.calls.append((model, method, None))
+        if (model, method) == ("ir.config_parameter", "set_param"):
+            key, value = args
+            self.params[key] = value
+            return True
+        if (model, method) != ("mail.thread", "message_process"):
+            raise AssertionError(f"Método no simulado: {model}.{method}")
+        target_model, raw = args
+        self.processed_emails.append({"model": target_model, "raw": raw, **kwargs})
+        return kwargs.get("thread_id")
 
     def xmlid(self, full_id):
         return self.xmlids[full_id]
@@ -149,10 +173,14 @@ class FakeOdooClient:
             q["quantity"] for q in self.records["stock.quant"].values()
             if (q["product_id"], q["location_id"]) == (product_id, location_id)
         )
-        drafts = {i for i, o in self.records["purchase.order"].items() if o["state"] == "draft"}
+        # Como Odoo: cuenta lo que viene en RFQ y compras abiertas, no en las canceladas.
+        open_orders = {
+            i for i, o in self.records["purchase.order"].items()
+            if o["state"] in ("draft", "sent", "to approve", "purchase")
+        }
         incoming = sum(
             line["product_qty"] for line in self.records["purchase.order.line"].values()
-            if line["product_id"] == product_id and line["order_id"] in drafts
+            if line["product_id"] == product_id and line["order_id"] in open_orders
         )
         return on_hand + incoming
 

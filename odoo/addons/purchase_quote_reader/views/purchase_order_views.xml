@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="purchase_order_form_quote_reader" model="ir.ui.view">
+        <field name="name">purchase.order.form.quote.reader</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//header" position="inside">
+                <button name="action_read_quote" type="object" string="Leer cotización"
+                        class="btn-secondary" invisible="supply_status != 'quote_received'"/>
+                <button name="action_apply_quote" type="object" string="Aplicar a la RFQ" class="btn-primary"
+                        invisible="not has_quote_differences or state not in ('draft', 'sent', 'to approve')"
+                        confirm="Se ajustarán las líneas de la RFQ con lo cotizado. ¿Continuar?"/>
+            </xpath>
+            <xpath expr="//notebook" position="inside">
+                <page string="Lectura de cotización" name="quote_reading" invisible="not quote_reading_line_ids">
+                    <field name="has_quote_differences" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="quote_reading_attachment_id"/>
+                            <field name="quote_read_at"/>
+                        </group>
+                        <group>
+                            <field name="quote_applied"/>
+                        </group>
+                    </group>
+                    <field name="quote_reading_line_ids">
+                        <tree create="0" delete="0" edit="0"
+                              decoration-success="status == 'same'"
+                              decoration-warning="status in ('price', 'partial', 'quantity')"
+                              decoration-danger="status == 'out_of_stock'"
+                              decoration-muted="status in ('not_quoted', 'not_in_rfq')">
+                            <field name="code"/>
+                            <field name="description"/>
+                            <field name="rfq_qty"/>
+                            <field name="quoted_qty"/>
+                            <field name="rfq_price"/>
+                            <field name="quoted_price"/>
+                            <field name="status" widget="badge"
+                                   decoration-success="status == 'same'"
+                                   decoration-warning="status in ('price', 'partial', 'quantity')"
+                                   decoration-danger="status == 'out_of_stock'"/>
+                        </tree>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

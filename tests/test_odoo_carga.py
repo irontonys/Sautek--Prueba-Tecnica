@@ -213,6 +213,23 @@ def test_rechazo_de_moneda_no_detiene_la_carga(tmp_path):
     assert "no se pudo poner la compañía en MXN" in loaded.warnings[0]
 
 
+def test_enlaces_de_los_correos_apuntan_al_odoo_de_la_conexion(tmp_path):
+    odoo = FakeOdooClient()
+
+    load(odoo, validated(tmp_path))
+
+    assert odoo.params == {"web.base.url": "http://localhost:8070", "web.base.url.freeze": "True"}
+
+
+def test_dentro_de_odoo_no_se_fija_la_direccion(tmp_path):
+    odoo = FakeOdooClient()
+    odoo.url = None
+
+    load(odoo, validated(tmp_path))
+
+    assert odoo.params == {}
+
+
 # Carga repetible
 
 def test_dos_cargas_no_duplican(tmp_path):

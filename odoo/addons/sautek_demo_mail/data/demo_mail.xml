@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Correo del entorno de demostración. Los servidores son los contenedores de
+     odoo/docker-compose.yml (GreenMail); nada sale a internet. -->
+<odoo noupdate="1">
+    <!-- Las respuestas a los correos de Odoo van a compras@ferretera.test. -->
+    <record id="alias_domain_ferretera" model="mail.alias.domain">
+        <field name="name">ferretera.test</field>
+        <field name="catchall_alias">compras</field>
+        <field name="bounce_alias">rebotes</field>
+        <field name="default_from">notificaciones</field>
+    </record>
+
+    <record id="base.main_company" model="res.company">
+        <field name="name">Ferretera Garza</field>
+        <field name="email">compras@ferretera.test</field>
+        <field name="alias_domain_id" ref="alias_domain_ferretera"/>
+    </record>
+
+    <!-- El comprador de la demo recibe sus avisos en este buzón del webmail. -->
+    <record id="base.user_admin" model="res.users">
+        <field name="email">comprador@ferretera.test</field>
+    </record>
+
+    <!-- Odoo revisa el buzón de compras y mete cada respuesta en su RFQ (por encabezados). -->
+    <record id="fetchmail_server_compras" model="fetchmail.server">
+        <field name="name">Buzón de compras (demostración)</field>
+        <field name="server_type">imap</field>
+        <field name="server">greenmail</field>
+        <field name="port">3143</field>
+        <field name="is_ssl" eval="False"/>
+        <field name="user">compras@ferretera.test</field>
+        <field name="password">demo</field>
+        <field name="state">done</field>
+    </record>
+
+    <!-- Para armar los PDF, Odoo se consulta a sí mismo; dentro del contenedor escucha en el
+         8069 (afuera está publicado en el 8070). Sin esto los PDF salen sin estilos. -->
+    <function model="ir.config_parameter" name="set_param" eval="('report.url', 'http://localhost:8069')"/>
+
+    <!-- En la demo todo corre cada minuto: recoger las respuestas y enviar los avisos que
+         quedan en la cola (Odoo trae la cola cada hora). -->
+    <record id="mail.ir_cron_mail_gateway_action" model="ir.cron">
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+    </record>
+
+    <record id="mail.ir_cron_mail_scheduler_action" model="ir.cron">
+        <field name="interval_number">1</field>
+        <field name="interval_type">minutes</field>
+    </record>
+</odoo>

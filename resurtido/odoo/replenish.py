@@ -54,6 +54,22 @@ def own_draft_rfqs(client, partner_ids):
     return own
 
 
+def in_progress_suppliers(client, loaded):
+    """Proveedores con compras enviadas, por aprobar o confirmadas que aún no se reciben completas."""
+    if not loaded.partner_ids:
+        return set()
+    supplier_by_partner = {pid: sid for sid, pid in loaded.partner_ids.items()}
+    orders = client.search_read(
+        "purchase.order",
+        [("partner_id", "in", sorted(supplier_by_partner)), ("state", "in", ["sent", "to approve", "purchase"])],
+        ["partner_id", "receipt_status"],
+    )
+    return {
+        supplier_by_partner[m2o_id(order["partner_id"])]
+        for order in orders if order.get("receipt_status") != "full"
+    }
+
+
 def cancel_previous(client, partner_ids):
     """Cancela las RFQ en borrador que dejó una corrida anterior. Regresa sus nombres."""
     previous = own_draft_rfqs(client, partner_ids)
@@ -87,6 +103,19 @@ def read_rfqs(client, loaded):
             if m2o_id(line["product_id"]) in code_by_product
         )
     return rfqs
+
+
+def subscribe_buyer(client, rfqs):
+    """El usuario de la conexión sigue las RFQ para recibir sus avisos.
+
+    Se agrega como seguidor y no como comprador (`user_id`): Odoo junta compras nuevas
+    en RFQ cuyo comprador coincide con el del proveedor (supuesto 19).
+    """
+    order_ids = sorted(order_id for rfq in rfqs.values() for order_id in rfq.order_ids)
+    if not order_ids:
+        return
+    user = client.search_read("res.users", [("id", "=", client.uid)], ["partner_id"])
+    client.call("purchase.order", "message_subscribe", order_ids, partner_ids=[m2o_id(user[0]["partner_id"])])
 
 
 def _note(client, order_ids, body):
