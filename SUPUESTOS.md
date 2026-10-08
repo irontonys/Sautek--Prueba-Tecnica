@@ -37,3 +37,10 @@ Qué se hace con cada tipo de problema está en [`excepciones.csv`](output/excep
 17. **Solo el comando dispara compras.** Las reglas de reabastecimiento quedan en modo manual: el scheduler nocturno de Odoo no genera compras por su cuenta. Las cantidades sí las calcula Odoo.
 18. **Moneda MXN.** La base nueva de Odoo arranca en USD; el comando pone la compañía en pesos mexicanos. Si Odoo no lo permite (por ejemplo, porque ya hay asientos contables), avisa y sigue: la moneda no cambia ningún total.
 19. **Odoo sin comprador asignado al proveedor.** Odoo junta compras nuevas en una RFQ en borrador del mismo proveedor solo si esa RFQ no tiene comprador. Las RFQ hechas a mano desde la interfaz siempre lo tienen, así que no se mezclan con las del comando.
+
+## Libro de Excel
+
+20. **Las reglas están escritas dos veces.** El libro no puede depender de Python porque Compras no lo tiene instalado, así que la validación, el cálculo de pedidos y los correos están en VBA (`excel/vba/`) y en Python (`resurtido/`). **Una regla se cambia en los dos lados en el mismo commit.** `tests/test_excel_paridad.py` compara los dos resultados con el Excel real y con libros que cubren todos los tipos de excepción, y falla si se desfasan.
+21. **Las correcciones se hacen en el libro.** El supuesto 3 sigue en pie: el archivo exportado no se toca. El comprador corrige la copia que **Cargar inventario** deja en el libro, y la hoja **Correcciones** muestra cada celda que cambió contra lo que se cargó.
+22. **Cantidades ajustadas por el comprador.** En **Detalle** el comprador puede cambiar la cantidad de un producto, por ejemplo para completar un pedido mínimo (supuesto 10). Los correos usan esas cantidades; un producto con cantidad 0 no aparece en el correo. El libro no impide pasar del máximo ni pedir algo que no es múltiplo del empaque: lo resalta y la decisión es del comprador.
+23. **Fecha de los correos en el libro.** Es la del día en que se da **Generar correos**, igual que el supuesto 14.

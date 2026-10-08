@@ -9,7 +9,9 @@ Esta carpeta es para quien cambia el código del libro. El comprador solo usa `R
 | `tools/Constructor.bas` | Macro que importa los módulos y guarda el libro |
 | `tools/constructor.xlsm` | Libro que contiene `Constructor.bas`; lo abre `build.py` |
 
-Los `.bas` van sin acentos: el editor de VBA no importa bien UTF-8.
+Los `.bas` van sin acentos: el editor de VBA no importa bien UTF-8. `build.py` lo revisa, junto con que las variables y constantes de cada módulo vayan antes de la primera función (si no, Excel se traba sin mostrar el error).
+
+Las reglas del libro son las mismas que las de `resurtido/` en Python: **una regla se cambia en los dos lados**. Después de armar el libro, corre `python -m pytest`; `tests/test_excel_paridad.py` compara los dos resultados y falla si se desfasan.
 
 ## Preparación (una sola vez)
 
